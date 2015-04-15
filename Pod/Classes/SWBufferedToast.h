@@ -20,6 +20,7 @@
 
 @interface SWBufferedToast : UIView <SWPlainToastDelegate>
 
+@property (nonatomic, strong) SWToast *toastView;
 @property (nonatomic, assign) BOOL isLocked;
 @property (nonatomic, weak) id <SWBufferedToastDelegate> delegate;
 

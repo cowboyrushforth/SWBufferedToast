@@ -34,6 +34,11 @@ typedef NS_ENUM(NSInteger, SWBufferedToastType) {
 @property (nonatomic, readonly) BOOL loadingBlocksDismiss;
 @property (nonatomic, weak) id <SWPlainToastDelegate> plainToastDelegate;
 @property (nonatomic, weak) id <SWLoginToastDelegate> loginToastDelegate;
+@property (nonatomic, strong) UILabel *titleLabel;
+@property (nonatomic, strong) UILabel *subtitleLabel;
+@property (nonatomic, strong) UIButton *actionButton;
+@property (nonatomic, strong) UITextField *usernameField;
+@property (nonatomic, strong) UITextField *passwordField;
 
 - (instancetype)initPlainToastWithColour:(UIColor*)color
                                    title:(NSString*)title

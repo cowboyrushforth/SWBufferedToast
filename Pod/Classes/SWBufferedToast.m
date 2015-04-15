@@ -11,7 +11,6 @@
 @interface SWBufferedToast()
 
 @property (nonatomic, weak) UIView *parentView;
-@property (nonatomic, strong) SWToast *toastView;
 
 @property (nonatomic, strong) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, assign) float firstY;

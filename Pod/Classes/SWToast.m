@@ -28,11 +28,6 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
 @property (nonatomic, strong) NSLayoutConstraint *constraintY;
 @property (nonatomic, strong) UIImageView *bufferImage;
 @property (nonatomic, strong) UIImageView *bufferImageMask;
-@property (nonatomic, strong) UILabel *titleLabel;
-@property (nonatomic, strong) UILabel *subtitleLabel;
-@property (nonatomic, strong) UIButton *actionButton;
-@property (nonatomic, strong) UITextField *usernameField;
-@property (nonatomic, strong) UITextField *passwordField;
 @property (nonatomic, strong) NSBundle *bundle;
 
 @end
