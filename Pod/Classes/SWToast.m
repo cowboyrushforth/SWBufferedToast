@@ -90,6 +90,37 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
         self.usernameField.placeholder = usernameTitle;
         self.passwordField.placeholder = passwordTitle;
         [self.actionButton setTitle:doneTitle forState:UIControlStateNormal];
+        [self.forgotPasswordButton setTitle:@"forgot Password?" forState:UIControlStateNormal];
+
+    }
+    
+    return self;
+}
+
+- (instancetype)initForgotPasswordToastWithColour:(UIColor*)color
+                                            title:(NSString*)title
+                                    usernameTitle:(NSString*)usernameTitle
+                                        doneTitle:(NSString*)doneTitle
+                              animationImageNames:(NSArray*)animationImageNames
+                                    loginDelegate:(id)forgotPasswordDelegate
+                                        andParent:(SWBufferedToast*)parentView
+{
+    self = [super init];
+    
+    if (self) {
+        self.toastType = SWBufferedToastTypeForgotPassword;
+        self.parentView = parentView;
+        self.forgotPasswordToastDelegate = forgotPasswordDelegate;
+        
+        self.backgroundColor = color;
+        self.layer.cornerRadius = kToastCornerRadius;
+        self.clipsToBounds = YES;
+        
+        self.userAnimationImageNames = [animationImageNames mutableCopy];
+        self.titleLabel.text = title;
+        self.usernameField.placeholder = usernameTitle;
+        [self.actionButton setTitle:doneTitle forState:UIControlStateNormal];
+        
     }
     
     return self;
@@ -136,6 +167,9 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
         case SWBufferedToastTypeLogin:
             return YES;
             break;
+        case SWBufferedToastTypeForgotPassword:
+            return YES;
+            break;
         default:
             return NO;
             break;
@@ -176,6 +210,7 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
         _usernameField.font = [UIFont fontWithName:@"HelveticaNeue-Thin" size:18.0f];
         [_usernameField setTintColor:[UIColor whiteColor]];
         _usernameField.delegate = self;
+        _usernameField.tag = 0;
     }
     
     return _usernameField;
@@ -191,6 +226,7 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
         [_passwordField setSecureTextEntry:YES];
         [_passwordField setTintColor:[UIColor whiteColor]];
         _passwordField.delegate = self;
+        _passwordField.tag = 1;
     }
     
     return _passwordField;
@@ -207,6 +243,18 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
     }
     
     return _actionButton;
+}
+
+- (UIButton *)forgotPasswordButton
+{
+    if(!_forgotPasswordButton) {
+        _forgotPasswordButton = [[UIButton alloc] init];
+        [_forgotPasswordButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+        [_forgotPasswordButton setTitleColor:[self darkerColorForColor:self.backgroundColor] forState:UIControlStateDisabled];
+        _forgotPasswordButton.titleLabel.font = [UIFont fontWithName:@"HelveticaNeue-Light" size:12.0f];
+        [_forgotPasswordButton addTarget:self action:@selector(didTapForgotPasswordButton:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    return _forgotPasswordButton;
 }
 
 - (NSMutableArray *)defaultAnimationImageNames
@@ -311,10 +359,11 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
 - (void)showBuffer
 {
     self.isLoading = YES;
-    if (self.toastType == SWBufferedToastTypeLogin) {
+    if (self.toastType == SWBufferedToastTypeLogin || self.toastType == SWBufferedToastTypeForgotPassword) {
         [self.usernameField setEnabled:NO];
         [self.passwordField setEnabled:NO];
         [self.actionButton setEnabled:NO];
+        [self.forgotPasswordButton setEnabled:NO];
     }
     [self showBufferAnimation];
     
@@ -326,6 +375,10 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
     if (self.toastType == SWBufferedToastTypeLogin) {
         [self.usernameField setEnabled:YES];
         [self.passwordField setEnabled:YES];
+        [self.actionButton setEnabled:YES];
+        [self.forgotPasswordButton setEnabled:YES];
+    } else if (self.toastType == SWBufferedToastTypeForgotPassword) {
+        [self.usernameField setEnabled:YES];
         [self.actionButton setEnabled:YES];
     }
     [self hideBufferAnimation];
@@ -339,7 +392,15 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
     }
     else if (self.toastType == SWBufferedToastTypeLogin){
         [self performLoginAction];
+    } else if (self.toastType == SWBufferedToastTypeForgotPassword) {
+        [self performPasswordResetAction];
     }
+}
+
+- (void)didTapForgotPasswordButton:(id)sender
+{
+    [self endEditing:YES];
+    [self.loginToastDelegate forgotPasswordButtonTapped];
 }
 
 - (void)performNoticeAction
@@ -354,6 +415,10 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
     [self endEditing:YES];
 }
 
+-(void)performPasswordResetAction {
+    [self.forgotPasswordToastDelegate resetButtonTappedWithUsername:self.usernameField.text];
+    [self endEditing:YES];
+}
 
 #pragma mark - animation types
 - (void)appearAnimationNotice
@@ -433,7 +498,7 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
 - (void)showBufferAnimation
 {
     if(self.animationImageNames){
-        self.bufferImage.alpha = 0.0f;
+        self.bufferImage.alpha = 1.0f;
         [SWToastConstraintManager applyBufferMaskConstraintsForImageView:self.bufferImageMask onToast:self];
         [SWToastConstraintManager applyBufferMaskConstraintsForImageView:self.bufferImage onToast:self];
         
@@ -473,6 +538,12 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
         [SWToastConstraintManager applyTextfieldConstraintsForUsernameField:self.usernameField toTitleLabel:self.titleLabel onToast:self];
         [SWToastConstraintManager applyTextfieldConstraintsForPasswordField:self.passwordField toUsernameField:self.usernameField onToast:self];
         [SWToastConstraintManager applyButtonConstraintsForButton:self.actionButton onToast:self];
+        [SWToastConstraintManager applyLowerButtonConstraintsForButton:self.forgotPasswordButton onToast:self];
+    }
+    else if (self.toastType == SWBufferedToastTypeForgotPassword){
+        [SWToastConstraintManager applyTextfieldConstraintsForUsernameField:self.usernameField toTitleLabel:self.titleLabel onToast:self];
+        [SWToastConstraintManager applyButtonConstraintsForButton:self.actionButton onToast:self];
+
     }
     else{
         [SWToastConstraintManager applySubtitleConstraintsForLabel:self.subtitleLabel toTitleLabel:self.titleLabel onToast:self];
@@ -563,11 +634,31 @@ static NSString * const kBundlePath                 = @"SWBufferedToast";
 }
 
 
+-(BOOL)textFieldShouldReturn:(UITextField*)textField
+{
+    NSInteger nextTag = textField.tag + 1;
+    // Try to find next responder
+    UIResponder* nextResponder = [textField.superview viewWithTag:nextTag];
+    if (nextResponder) {
+        // Found next responder, so set it.
+        [nextResponder becomeFirstResponder];
+    } else {
+        // Not found, so remove keyboard.
+        [textField resignFirstResponder];
+        if (self.toastType == SWBufferedToastTypeLogin){
+            [self performLoginAction];
+        }
+    }
+    return NO; // We do not want UITextField to insert line-breaks.
+}
+
+
 #pragma mark - cleanup
 - (void)dealloc
 {
     self.plainToastDelegate = nil;
     self.loginToastDelegate = nil;
+    self.forgotPasswordToastDelegate = nil;
 }
 
 @end

@@ -18,13 +18,21 @@
 
 - (void)loginButtonTappedWithUsername:(NSString*)username
                           andPassword:(NSString*)password;
+- (void)forgotPasswordButtonTapped;
+
+@end
+
+@protocol SWForgotPasswordDelegate <NSObject>
+
+- (void)resetButtonTappedWithUsername:(NSString*)username;
 
 @end
 
 typedef NS_ENUM(NSInteger, SWBufferedToastType) {
     SWBufferedToastTypePlain,
     SWBufferedToastTypeLogin,
-    SWBufferedToastTypeNotice
+    SWBufferedToastTypeNotice,
+    SWBufferedToastTypeForgotPassword
 };
 
 @interface SWToast : UIView <UITextFieldDelegate>
@@ -34,9 +42,11 @@ typedef NS_ENUM(NSInteger, SWBufferedToastType) {
 @property (nonatomic, readonly) BOOL loadingBlocksDismiss;
 @property (nonatomic, weak) id <SWPlainToastDelegate> plainToastDelegate;
 @property (nonatomic, weak) id <SWLoginToastDelegate> loginToastDelegate;
+@property (nonatomic, weak) id <SWForgotPasswordDelegate> forgotPasswordToastDelegate;
 @property (nonatomic, strong) UILabel *titleLabel;
 @property (nonatomic, strong) UILabel *subtitleLabel;
 @property (nonatomic, strong) UIButton *actionButton;
+@property (nonatomic, strong) UIButton *forgotPasswordButton;
 @property (nonatomic, strong) UITextField *usernameField;
 @property (nonatomic, strong) UITextField *passwordField;
 
@@ -55,6 +65,15 @@ typedef NS_ENUM(NSInteger, SWBufferedToastType) {
                                doneTitle:(NSString*)doneTitle
                      animationImageNames:(NSArray*)animationImageNames
                            loginDelegate:(id)loginDelegate
+                               andParent:(UIView*)parentView;
+
+
+- (instancetype)initForgotPasswordToastWithColour:(UIColor*)color
+                                   title:(NSString*)title
+                           usernameTitle:(NSString*)usernameTitle
+                               doneTitle:(NSString*)doneTitle
+                     animationImageNames:(NSArray*)animationImageNames
+                           loginDelegate:(id)forgotPasswordDelegate
                                andParent:(UIView*)parentView;
 
 - (instancetype)initNoticeToastWithColour:(UIColor*)color

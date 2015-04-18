@@ -15,15 +15,19 @@
 #define kPlainToastMultiplerHeight  (IPAD ? 0.3f : 0.55f);
 #define kLoginToastMultiplierWidth  (IPAD ? 0.7f : 0.9f);
 #define kLoginToastMultiplierHeight (IPAD ? 0.25f : 0.50f);
+#define kForgotPasswordToastMultiplierWidth  (IPAD ? 0.7f : 0.9f);
+#define kForgotPasswordToastMultiplierHeight (IPAD ? 0.25f : 0.50f);
 #define kNoticeToastHeight          180.0f;
 #define KNoticeToastWidth           300.0f;
 #define kMultiplierBufferHeight     0.8f;
 #define kLabelHeightTitle           40.0f;
 #define kButtonHeightAction         70.0f;
+#define kLowerButtonHeightAction    40.0f;
 #define kTextfieldHeightUsername    70.0f;
 #define kTextfieldHeightPassword    70.0f;
 #define kTextfieldTitleDistance     -10.0f;
 #define kLoginToastHeight           (IPAD ? 220.0f : 200.0f);
+#define kForgotPasswordToastHeight  (IPAD ? 200.0f : 160.0f);
 
 
 @implementation SWToastConstraintManager
@@ -39,6 +43,65 @@
             //Add view's constraints
             float width = kLoginToastMultiplierWidth;
             float height = kLoginToastHeight;
+            NSLayoutConstraint *widthConstraint;
+            
+            if (IPAD) {
+                widthConstraint    = [NSLayoutConstraint constraintWithItem:toast
+                                                                  attribute:NSLayoutAttributeWidth
+                                                                  relatedBy:0
+                                                                     toItem:nil
+                                                                  attribute:NSLayoutAttributeNotAnAttribute
+                                                                 multiplier:1.0f
+                                                                   constant:300];
+            }
+            else{
+                widthConstraint     = [NSLayoutConstraint constraintWithItem:toast
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                   relatedBy:0
+                                                                      toItem:parentView
+                                                                   attribute:NSLayoutAttributeWidth
+                                                                  multiplier:width
+                                                                    constant:0];
+            }
+            
+            
+            NSLayoutConstraint *heightConstraint    = [NSLayoutConstraint constraintWithItem:toast
+                                                                                   attribute:NSLayoutAttributeHeight
+                                                                                   relatedBy:0
+                                                                                      toItem:nil
+                                                                                   attribute:NSLayoutAttributeNotAnAttribute
+                                                                                  multiplier:1.0f
+                                                                                    constant:height];
+            
+            NSLayoutConstraint *constraintX         = [NSLayoutConstraint constraintWithItem:toast
+                                                                                   attribute:NSLayoutAttributeCenterX
+                                                                                   relatedBy:NSLayoutRelationEqual
+                                                                                      toItem:parentView
+                                                                                   attribute:NSLayoutAttributeCenterX
+                                                                                  multiplier:1.0f
+                                                                                    constant:0];
+            
+            NSLayoutConstraint *constraintY         = [NSLayoutConstraint constraintWithItem:toast
+                                                                                   attribute:NSLayoutAttributeCenterY
+                                                                                   relatedBy:NSLayoutRelationEqual
+                                                                                      toItem:parentView
+                                                                                   attribute:NSLayoutAttributeCenterY
+                                                                                  multiplier:1.0f
+                                                                                    constant:-height];
+            
+            
+            [parentView addConstraints:@[widthConstraint, heightConstraint, constraintX, constraintY]];
+            return constraintY;
+        }
+            break;
+            
+        case SWBufferedToastTypeForgotPassword:
+        {
+            [parentView addSubview:toast];
+            toast.translatesAutoresizingMaskIntoConstraints = NO;
+            //Add view's constraints
+            float width = kForgotPasswordToastMultiplierWidth;
+            float height = kForgotPasswordToastHeight;
             NSLayoutConstraint *widthConstraint;
             
             if (IPAD) {
@@ -354,7 +417,7 @@
                                                                                attribute:NSLayoutAttributeBottom
                                                                               multiplier:1.0f
                                                                                 constant:-20.f];
-    
+
     
     [toast addConstraints:@[widthConstraint, constraintX, topConstraint, bottomConstraint]];
 }
@@ -489,10 +552,55 @@
                                                                                   toItem:toast
                                                                                attribute:NSLayoutAttributeBottom
                                                                               multiplier:1.0f
-                                                                                constant:0.0f];
+                                                                                constant:-10.0f];
     
     [toast addConstraints:@[widthConstraint, heightConstraint, constraintX, bottomConstraint]];
 }
+
++ (void)applyLowerButtonConstraintsForButton:(UIButton *)button
+                                onToast:(SWToast *)toast
+{
+    [toast addSubview:button];
+    button.translatesAutoresizingMaskIntoConstraints = NO;
+    button.userInteractionEnabled = YES;
+    float height = kLowerButtonHeightAction;
+    
+    NSLayoutConstraint *widthConstraint         = [NSLayoutConstraint constraintWithItem:button
+                                                                               attribute:NSLayoutAttributeWidth
+                                                                               relatedBy:0
+                                                                                  toItem:toast
+                                                                               attribute:NSLayoutAttributeWidth
+                                                                              multiplier:1
+                                                                                constant:-20];
+    
+    
+    NSLayoutConstraint *heightConstraint        = [NSLayoutConstraint constraintWithItem:button
+                                                                               attribute:NSLayoutAttributeHeight
+                                                                               relatedBy:0
+                                                                                  toItem:nil
+                                                                               attribute:NSLayoutAttributeNotAnAttribute
+                                                                              multiplier:1.0f
+                                                                                constant:height];
+    
+    NSLayoutConstraint *constraintX             = [NSLayoutConstraint constraintWithItem:button
+                                                                               attribute:NSLayoutAttributeCenterX
+                                                                               relatedBy:NSLayoutRelationEqual
+                                                                                  toItem:toast
+                                                                               attribute:NSLayoutAttributeCenterX
+                                                                              multiplier:1.0f
+                                                                                constant:0];
+    
+    NSLayoutConstraint *bottomConstraint        = [NSLayoutConstraint constraintWithItem:button
+                                                                               attribute:NSLayoutAttributeBottom
+                                                                               relatedBy:NSLayoutRelationEqual
+                                                                                  toItem:toast
+                                                                               attribute:NSLayoutAttributeBottom
+                                                                              multiplier:1.0f
+                                                                                constant:5.0f];
+    
+    [toast addConstraints:@[widthConstraint, heightConstraint, constraintX, bottomConstraint]];
+}
+
 
 
 @end

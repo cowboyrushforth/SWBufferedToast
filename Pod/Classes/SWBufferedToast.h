@@ -14,6 +14,8 @@
 - (void)didTapActionButton;
 - (void)didAttemptLoginWithUsername:(NSString*)username
                         andPassword:(NSString*)password;
+- (void)didTapForgotPasswordButton;
+- (void)didAttemptPasswordResetWithUsername:(NSString*)username;
 - (void)didDismissToastView;
 
 @end
@@ -43,6 +45,15 @@
                             andDelegate:(id)delegate
                                  onView:(UIView*)parentView;
 
+- (instancetype)initForgotPasswordToastWithTitle:(NSString*)title
+                          usernameTitle:(NSString*)usernameTitle
+                              doneTitle:(NSString*)doneTitle
+                       backgroundColour:(UIColor*)backgroundColor
+                             toastColor:(UIColor*)toastColor
+                    animationImageNames:(NSArray*)animationImageNames
+                            andDelegate:(id)delegate
+                                 onView:(UIView*)parentView;
+
 - (instancetype)initNoticeToastWithTitle:(NSString*)title
                                 subtitle:(NSString*)subtitle
                            timeToDisplay:(NSInteger)timeToDisplay
@@ -53,6 +64,7 @@
 
 - (void)appear;
 - (void)dismiss;
+- (void)dismissAndWait:(void(^)())completionBlock;
 - (void)beginLoading;
 - (void)endLoading;
 

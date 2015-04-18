@@ -41,4 +41,7 @@
 + (void)applyButtonConstraintsForButton:(UIButton *)button
                                 onToast:(SWToast *)toast;
 
++ (void)applyLowerButtonConstraintsForButton:(UIButton *)button
+                                     onToast:(SWToast *)toast;
+
 @end

@@ -82,6 +82,33 @@
     return self;
 }
 
+- (instancetype)initForgotPasswordToastWithTitle:(NSString*)title
+                                   usernameTitle:(NSString*)usernameTitle
+                                       doneTitle:(NSString*)doneTitle
+                                backgroundColour:(UIColor*)backgroundColor
+                                      toastColor:(UIColor*)toastColor
+                             animationImageNames:(NSArray*)animationImageNames
+                                     andDelegate:(id)delegate
+                                          onView:(UIView*)parentView
+{
+    self = [super init];
+    if (self) {
+        self.backgroundColor = backgroundColor;
+        self.parentView = parentView;
+        self.toastView = [[SWToast alloc] initForgotPasswordToastWithColour:toastColor
+                                                             title:title
+                                                     usernameTitle:usernameTitle
+                                                         doneTitle:doneTitle
+                                               animationImageNames:animationImageNames
+                                                     loginDelegate:self
+                                                         andParent:self];
+        
+        self.delegate = delegate;
+        [self.toastView addGestureRecognizer:self.panGestureRecognizer];
+    }
+    return self;
+}
+
 - (instancetype)initNoticeToastWithTitle:(NSString *)title
                                 subtitle:(NSString*)subtitle
                            timeToDisplay:(NSInteger)timeToDisplay
@@ -149,6 +176,21 @@
     }];
 }
 
+-(void)dismissAndWait:(void(^)())completionBlock {
+    [UIView animateWithDuration:0.25 animations:^{
+        self.alpha = 0;
+        [self.toastView disappear];
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [self removeFromSuperview];
+            [self.delegate didDismissToastView];
+            if(completionBlock) {
+                completionBlock();
+            }
+        }
+    }];
+}
+
 - (void)setupDismissTimer
 {
     if (self.timeToDisplay > 0) {
@@ -211,7 +253,7 @@
             }
             else{
                 if (self.toastView.center.y < (self.frame.size.height/2 - (self.frame.size.height/4))
-                    && ((self.toastView.toastType == SWBufferedToastTypeLogin) || (self.toastView.toastType == SWBufferedToastTypePlain))) {
+                    && ((self.toastView.toastType == SWBufferedToastTypeLogin) || (self.toastView.toastType == SWBufferedToastTypeForgotPassword) || (self.toastView.toastType == SWBufferedToastTypePlain))) {
                     [self dismiss];
                 }
                 else{
@@ -289,11 +331,22 @@
                                          andPassword:password];
 }
 
+-(void)forgotPasswordButtonTapped {
+    [self.delegate didTapForgotPasswordButton];
+}
+
+#pragma mark - forgot password toast delegate impl
+
+-(void)resetButtonTappedWithUsername:(NSString*)username {
+    [self.delegate didAttemptPasswordResetWithUsername:username];
+}
 
 #pragma mark - cleanup
 - (void)dealloc
 {
     self.delegate = nil;
 }
+
+
 
 @end
