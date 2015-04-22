@@ -25,9 +25,9 @@
 #define kLowerButtonHeightAction    40.0f;
 #define kTextfieldHeightUsername    70.0f;
 #define kTextfieldHeightPassword    70.0f;
-#define kTextfieldTitleDistance     -10.0f;
-#define kLoginToastHeight           (IPAD ? 220.0f : 200.0f);
-#define kForgotPasswordToastHeight  (IPAD ? 200.0f : 160.0f);
+#define kTextfieldTitleDistance     -3.0f;
+#define kLoginToastHeight           (IPAD ? 240.0f : 220.0f);
+#define kForgotPasswordToastHeight  (IPAD ? 180.0f : 140.0f);
 
 
 @implementation SWToastConstraintManager
@@ -432,6 +432,10 @@
     float height = kTextfieldHeightUsername;
     float topDistance = kTextfieldTitleDistance;
     
+    if(toast.toastType == SWBufferedToastTypeForgotPassword) {
+        topDistance = -12.0f;
+    }
+    
     NSLayoutConstraint *widthConstraint         = [NSLayoutConstraint constraintWithItem:usernameField
                                                                                attribute:NSLayoutAttributeWidth
                                                                                relatedBy:0
@@ -521,6 +525,11 @@
     button.userInteractionEnabled = YES;
     float height = kButtonHeightAction;
     
+    float bottomSpacing = -20.0f;
+    if(toast.toastType == SWBufferedToastTypeForgotPassword) {
+        bottomSpacing = 10.0f;
+    }
+    
     NSLayoutConstraint *widthConstraint         = [NSLayoutConstraint constraintWithItem:button
                                                                                attribute:NSLayoutAttributeWidth
                                                                                relatedBy:0
@@ -552,7 +561,7 @@
                                                                                   toItem:toast
                                                                                attribute:NSLayoutAttributeBottom
                                                                               multiplier:1.0f
-                                                                                constant:-10.0f];
+                                                                                constant:bottomSpacing];
     
     [toast addConstraints:@[widthConstraint, heightConstraint, constraintX, bottomConstraint]];
 }
